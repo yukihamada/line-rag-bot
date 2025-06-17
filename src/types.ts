@@ -7,6 +7,8 @@ export interface Env {
   LINE_CHANNEL_TOKEN: string;
   CF_API_TOKEN: string;
   CF_ACCOUNT_ID: string;
+  MCP_SERVER: DurableObjectNamespace;
+  MCP_SERVER_URL?: string;
 }
 
 export interface LineEvent {

@@ -2,11 +2,25 @@ import { Hono } from 'hono';
 import { HmacSHA256, enc } from 'crypto-js';
 import { handleLineWebhook } from './line/webhook';
 import { Env } from './types';
+import { MCPServer } from './mcp/server';
 
 const app = new Hono<{ Bindings: Env }>();
 
 app.get('/', (c) => {
-  return c.text('LINE RAG Bot is running!');
+  return c.text('LINE RAG Bot with MCP Server is running!');
+});
+
+// MCP Serverエンドポイント
+app.all('/mcp', async (c) => {
+  const id = c.env.MCP_SERVER.idFromName('main');
+  const stub = c.env.MCP_SERVER.get(id);
+  return stub.fetch(c.req.raw);
+});
+
+app.all('/mcp/*', async (c) => {
+  const id = c.env.MCP_SERVER.idFromName('main');
+  const stub = c.env.MCP_SERVER.get(id);
+  return stub.fetch(c.req.raw);
 });
 
 app.post('/webhook', async (c) => {
@@ -34,3 +48,6 @@ app.post('/webhook', async (c) => {
 });
 
 export default app;
+
+// Durable Object export
+export { MCPServer };

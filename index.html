@@ -210,7 +210,7 @@
 <body>
     <header>
         <h1>🤖 LINE RAG Bot</h1>
-        <p class="subtitle">Cloudflare完結型の高性能LINE Bot with RAG</p>
+        <p class="subtitle">Cloudflare完結型の高性能LINE Bot with RAG & MCP</p>
     </header>
 
     <div class="container">
@@ -235,6 +235,10 @@
             <h2>🏗️ システムアーキテクチャ</h2>
             <div class="architecture">
 LINE ↔ Cloudflare Worker (Edge) ─┬─ LangChain JS (RAG Chain)
+                                  │
+                                  ├─ MCP Server (Durable Object)
+                                  │   ├─ Tools (search, sentiment, web)
+                                  │   └─ Resources & Prompts
                                   │
                                   ├─ Workers AI  (embedding + chat LLM)
                                   │
@@ -270,6 +274,10 @@ LINE ↔ Cloudflare Worker (Edge) ─┬─ LangChain JS (RAG Chain)
                 <div class="feature">
                     <h4>📊 スケーラブル</h4>
                     <p>Cloudflareのグローバルネットワークで自動スケーリング</p>
+                </div>
+                <div class="feature">
+                    <h4>🔌 MCPサポート</h4>
+                    <p>Model Context Protocolによる拡張可能なツール統合</p>
                 </div>
             </div>
         </div>
@@ -469,6 +477,59 @@ npm run upload-docs # ドキュメントアップロード</pre>
         </div>
 
         <div class="card">
+            <h2>🤝 MCP (Model Context Protocol) サポート</h2>
+            
+            <h3>概要</h3>
+            <p>MCPサーバーを実装し、AIアシスタントと外部システムを接続するための標準プロトコルをサポートします。</p>
+            
+            <h3>MCPエンドポイント</h3>
+            <ul>
+                <li><strong>WebSocket:</strong> <code>wss://your-worker.workers.dev/mcp</code></li>
+                <li><strong>HTTP:</strong> <code>https://your-worker.workers.dev/mcp</code></li>
+                <li><strong>SSE:</strong> <code>https://your-worker.workers.dev/mcp/sse</code></li>
+            </ul>
+            
+            <h3>実装されたMCPツール</h3>
+            <div class="features">
+                <div class="feature">
+                    <h4>search_knowledge</h4>
+                    <p>Vectorize内のドキュメントから関連情報を検索</p>
+                </div>
+                <div class="feature">
+                    <h4>get_conversation_history</h4>
+                    <p>ユーザーの会話履歴をD1から取得</p>
+                </div>
+                <div class="feature">
+                    <h4>analyze_sentiment</h4>
+                    <p>Workers AIを使用した感情分析</p>
+                </div>
+                <div class="feature">
+                    <h4>web_search</h4>
+                    <p>外部Web情報の検索（DuckDuckGo API）</p>
+                </div>
+            </div>
+            
+            <h3>MCPの有効化</h3>
+            <pre>wrangler secret put MCP_SERVER_URL
+# https://your-worker.workers.dev/mcp を入力</pre>
+            
+            <h3>使用例</h3>
+            <pre>// MCP Clientの使用
+const mcpClient = new MCPClient('https://your-worker.workers.dev/mcp');
+await mcpClient.connectHTTP();
+
+// ツール実行
+const results = await mcpClient.searchKnowledge('検索クエリ', 5);
+const sentiment = await mcpClient.analyzeSentiment('分析テキスト');</pre>
+            
+            <div class="links">
+                <a href="/docs/MCP_SPECIFICATION.md" class="button secondary">
+                    📄 MCP仕様書
+                </a>
+            </div>
+        </div>
+
+        <div class="card">
             <h2>🔮 今後の拡張案</h2>
             <ul>
                 <li>🖼️ 画像対応（Workers AI Vision モデル）</li>
@@ -477,6 +538,8 @@ npm run upload-docs # ドキュメントアップロード</pre>
                 <li>🔄 外部API連携（天気、ニュース等）</li>
                 <li>🎯 ファインチューニング対応</li>
                 <li>📱 リッチメニュー・カルーセル対応</li>
+                <li>🔐 MCP認証メカニズム（JWT/APIキー）</li>
+                <li>⚡ MCPバッチ処理・ストリーミング</li>
             </ul>
         </div>
     </div>

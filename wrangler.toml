@@ -21,6 +21,12 @@ index_name = "kb_index"
 binding = "KV"
 id = "xxxxxxxx-xxxx-xxxx-xxxx-xxxxxxxxxxxx"
 
+# Durable Objects（MCP Server用）
+[[durable_objects.bindings]]
+name = "MCP_SERVER"
+class_name = "MCPServer"
+script_name = "line-rag-bot"
+
 # 環境変数
 [vars]
 # これらの値は実際のデプロイ時にwrangler secretで設定
@@ -28,3 +34,4 @@ id = "xxxxxxxx-xxxx-xxxx-xxxx-xxxxxxxxxxxx"
 # LINE_CHANNEL_TOKEN = "your-channel-token"
 # CF_API_TOKEN = "your-cloudflare-api-token"
 # CF_ACCOUNT_ID = "your-cloudflare-account-id"
+# MCP_SERVER_URL = "https://your-worker.workers.dev/mcp"
