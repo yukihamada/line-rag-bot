@@ -1,0 +1,30 @@
+name = "line-rag-bot"
+main = "src/index.ts"
+compatibility_date = "2024-06-17"
+
+# Workers AI設定
+ai = { binding = "AI" }
+
+# D1データベース
+[[d1_databases]]
+binding = "DB"
+database_name = "bot_db"
+database_id = "xxxxxxxx-xxxx-xxxx-xxxx-xxxxxxxxxxxx"
+
+# Vectorizeインデックス
+[[vectorize]]
+binding = "VECTORIZE_INDEX"
+index_name = "kb_index"
+
+# KVネームスペース（オプション）
+[[kv_namespaces]]
+binding = "KV"
+id = "xxxxxxxx-xxxx-xxxx-xxxx-xxxxxxxxxxxx"
+
+# 環境変数
+[vars]
+# これらの値は実際のデプロイ時にwrangler secretで設定
+# LINE_CHANNEL_SECRET = "your-channel-secret"
+# LINE_CHANNEL_TOKEN = "your-channel-token"
+# CF_API_TOKEN = "your-cloudflare-api-token"
+# CF_ACCOUNT_ID = "your-cloudflare-account-id"

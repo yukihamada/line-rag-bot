@@ -1,0 +1,26 @@
+LINE RAG Botの使い方
+
+このBotは、Cloudflare Workers上で動作する高性能なRAG（Retrieval-Augmented Generation）システムです。
+
+主な機能：
+1. 自然言語での質問応答
+2. 文脈を考慮した回答生成
+3. 過去の会話履歴の記憶
+4. 高速なレスポンス
+
+使用技術：
+- Cloudflare Workers: エッジコンピューティング
+- Cloudflare Vectorize: ベクトル検索
+- Cloudflare D1: SQLデータベース
+- Workers AI: LLM推論（Llama 3 70B）
+- LangChain JS: RAGパイプライン
+
+よくある質問：
+Q: データはどこに保存されますか？
+A: すべてのデータはCloudflareのインフラ内に安全に保存されます。
+
+Q: 応答速度はどのくらいですか？
+A: エッジでの処理により、通常1-3秒以内に応答します。
+
+Q: カスタマイズは可能ですか？
+A: はい、プロンプトやモデルの変更が可能です。
