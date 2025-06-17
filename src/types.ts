@@ -9,6 +9,7 @@ export interface Env {
   CF_ACCOUNT_ID: string;
   MCP_SERVER: DurableObjectNamespace;
   MCP_SERVER_URL?: string;
+  ADMIN_KEY: string;
 }
 
 export interface LineEvent {

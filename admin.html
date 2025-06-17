@@ -1,0 +1,1088 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>LINE RAG Bot - 管理画面</title>
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+        
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Arial, sans-serif;
+            background: #f5f7fa;
+            color: #333;
+        }
+        
+        .login-container {
+            min-height: 100vh;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+        }
+        
+        .login-form {
+            background: white;
+            padding: 2rem;
+            border-radius: 12px;
+            box-shadow: 0 4px 20px rgba(0,0,0,0.1);
+            width: 100%;
+            max-width: 400px;
+        }
+        
+        .login-form h1 {
+            text-align: center;
+            margin-bottom: 1.5rem;
+            color: #333;
+        }
+        
+        .form-group {
+            margin-bottom: 1rem;
+        }
+        
+        label {
+            display: block;
+            margin-bottom: 0.5rem;
+            font-weight: 500;
+            color: #555;
+        }
+        
+        input[type="password"] {
+            width: 100%;
+            padding: 0.8rem;
+            border: 1px solid #ddd;
+            border-radius: 6px;
+            font-size: 1rem;
+        }
+        
+        .btn {
+            display: inline-block;
+            padding: 0.8rem 1.5rem;
+            background: #667eea;
+            color: white;
+            border: none;
+            border-radius: 6px;
+            cursor: pointer;
+            font-size: 1rem;
+            text-decoration: none;
+            transition: background 0.2s;
+            width: 100%;
+        }
+        
+        .btn:hover {
+            background: #764ba2;
+        }
+        
+        .btn.secondary {
+            background: #6c757d;
+        }
+        
+        .btn.secondary:hover {
+            background: #5a6268;
+        }
+        
+        .btn.danger {
+            background: #dc3545;
+        }
+        
+        .btn.danger:hover {
+            background: #c82333;
+        }
+        
+        .btn.small {
+            padding: 0.4rem 0.8rem;
+            font-size: 0.9rem;
+            width: auto;
+        }
+        
+        .error {
+            color: #dc3545;
+            font-size: 0.9rem;
+            margin-top: 0.5rem;
+        }
+        
+        .header {
+            background: white;
+            padding: 1rem 2rem;
+            box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+        
+        .header h1 {
+            color: #667eea;
+            font-size: 1.5rem;
+        }
+        
+        .nav-tabs {
+            background: white;
+            border-bottom: 1px solid #ddd;
+            display: flex;
+            padding: 0 2rem;
+        }
+        
+        .nav-tab {
+            padding: 1rem 1.5rem;
+            cursor: pointer;
+            border-bottom: 2px solid transparent;
+            transition: all 0.2s;
+        }
+        
+        .nav-tab:hover,
+        .nav-tab.active {
+            background: #f8f9fa;
+            border-bottom-color: #667eea;
+            color: #667eea;
+        }
+        
+        .main-content {
+            padding: 2rem;
+            max-width: 1400px;
+            margin: 0 auto;
+        }
+        
+        .dashboard-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+            gap: 1.5rem;
+            margin-bottom: 2rem;
+        }
+        
+        .card {
+            background: white;
+            border-radius: 12px;
+            padding: 1.5rem;
+            box-shadow: 0 2px 8px rgba(0,0,0,0.08);
+        }
+        
+        .card h3 {
+            margin-bottom: 1rem;
+            color: #333;
+            font-size: 1.2rem;
+        }
+        
+        .stat-card {
+            text-align: center;
+        }
+        
+        .stat-number {
+            font-size: 2.5rem;
+            font-weight: bold;
+            color: #667eea;
+            margin-bottom: 0.5rem;
+        }
+        
+        .stat-label {
+            color: #666;
+            font-size: 0.9rem;
+        }
+        
+        .chart-container {
+            position: relative;
+            height: 300px;
+        }
+        
+        .table-container {
+            overflow-x: auto;
+        }
+        
+        table {
+            width: 100%;
+            border-collapse: collapse;
+            margin-top: 1rem;
+        }
+        
+        th, td {
+            text-align: left;
+            padding: 0.8rem;
+            border-bottom: 1px solid #eee;
+        }
+        
+        th {
+            background: #f8f9fa;
+            font-weight: 600;
+            color: #555;
+        }
+        
+        .status {
+            display: inline-block;
+            padding: 0.3rem 0.8rem;
+            border-radius: 20px;
+            font-size: 0.8rem;
+            font-weight: 500;
+        }
+        
+        .status.active {
+            background: #d4edda;
+            color: #155724;
+        }
+        
+        .status.inactive {
+            background: #f8d7da;
+            color: #721c24;
+        }
+        
+        .search-bar {
+            margin-bottom: 1rem;
+            display: flex;
+            gap: 1rem;
+            align-items: center;
+        }
+        
+        .search-input {
+            flex: 1;
+            padding: 0.8rem;
+            border: 1px solid #ddd;
+            border-radius: 6px;
+        }
+        
+        .pagination {
+            display: flex;
+            justify-content: center;
+            gap: 0.5rem;
+            margin-top: 1rem;
+        }
+        
+        .page-btn {
+            padding: 0.5rem 1rem;
+            border: 1px solid #ddd;
+            background: white;
+            cursor: pointer;
+            border-radius: 4px;
+        }
+        
+        .page-btn.active {
+            background: #667eea;
+            color: white;
+            border-color: #667eea;
+        }
+        
+        .hidden {
+            display: none !important;
+        }
+        
+        .loading {
+            text-align: center;
+            padding: 2rem;
+            color: #666;
+        }
+        
+        .alert {
+            padding: 1rem;
+            border-radius: 6px;
+            margin-bottom: 1rem;
+        }
+        
+        .alert.success {
+            background: #d4edda;
+            color: #155724;
+            border: 1px solid #c3e6cb;
+        }
+        
+        .alert.error {
+            background: #f8d7da;
+            color: #721c24;
+            border: 1px solid #f5c6cb;
+        }
+        
+        .modal-overlay {
+            position: fixed;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background: rgba(0,0,0,0.5);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            z-index: 1000;
+        }
+        
+        .modal {
+            background: white;
+            border-radius: 12px;
+            padding: 2rem;
+            max-width: 500px;
+            width: 90%;
+            max-height: 80vh;
+            overflow-y: auto;
+        }
+        
+        .modal h2 {
+            margin-bottom: 1rem;
+            color: #333;
+        }
+        
+        .modal-actions {
+            display: flex;
+            gap: 1rem;
+            justify-content: flex-end;
+            margin-top: 1.5rem;
+        }
+        
+        @media (max-width: 768px) {
+            .header {
+                padding: 1rem;
+            }
+            
+            .nav-tabs {
+                padding: 0 1rem;
+                overflow-x: auto;
+            }
+            
+            .main-content {
+                padding: 1rem;
+            }
+            
+            .dashboard-grid {
+                grid-template-columns: 1fr;
+            }
+            
+            .search-bar {
+                flex-direction: column;
+                align-items: stretch;
+            }
+        }
+    </style>
+</head>
+<body>
+    <!-- ログイン画面 -->
+    <div id="loginScreen" class="login-container">
+        <div class="login-form">
+            <h1>🤖 管理画面ログイン</h1>
+            <form id="loginForm">
+                <div class="form-group">
+                    <label for="password">パスワード</label>
+                    <input type="password" id="password" required>
+                </div>
+                <button type="submit" class="btn">ログイン</button>
+                <div id="loginError" class="error hidden"></div>
+            </form>
+        </div>
+    </div>
+
+    <!-- メイン画面 -->
+    <div id="mainScreen" class="hidden">
+        <header class="header">
+            <h1>🤖 LINE RAG Bot 管理画面</h1>
+            <button id="logoutBtn" class="btn secondary small">ログアウト</button>
+        </header>
+
+        <nav class="nav-tabs">
+            <div class="nav-tab active" data-tab="dashboard">📊 ダッシュボード</div>
+            <div class="nav-tab" data-tab="documents">📄 ドキュメント</div>
+            <div class="nav-tab" data-tab="users">👥 ユーザー</div>
+            <div class="nav-tab" data-tab="mcp">🔌 MCP</div>
+            <div class="nav-tab" data-tab="settings">⚙️ 設定</div>
+            <div class="nav-tab" data-tab="logs">📋 ログ</div>
+        </nav>
+
+        <main class="main-content">
+            <!-- ダッシュボード -->
+            <div id="dashboard" class="tab-content">
+                <div class="dashboard-grid">
+                    <div class="card stat-card">
+                        <div class="stat-number" id="totalUsers">-</div>
+                        <div class="stat-label">総ユーザー数</div>
+                    </div>
+                    <div class="card stat-card">
+                        <div class="stat-number" id="totalMessages">-</div>
+                        <div class="stat-label">総メッセージ数</div>
+                    </div>
+                    <div class="card stat-card">
+                        <div class="stat-number" id="totalDocuments">-</div>
+                        <div class="stat-label">登録ドキュメント数</div>
+                    </div>
+                    <div class="card stat-card">
+                        <div class="stat-number" id="todayActiveUsers">-</div>
+                        <div class="stat-label">今日のアクティブユーザー</div>
+                    </div>
+                </div>
+
+                <div class="dashboard-grid">
+                    <div class="card">
+                        <h3>📈 週別統計</h3>
+                        <div class="chart-container">
+                            <canvas id="weeklyChart"></canvas>
+                        </div>
+                    </div>
+                    <div class="card">
+                        <h3>🔥 人気トピック</h3>
+                        <div id="popularTopics" class="loading">読み込み中...</div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- ドキュメント管理 -->
+            <div id="documents" class="tab-content hidden">
+                <div class="card">
+                    <div class="search-bar">
+                        <input type="text" class="search-input" placeholder="ドキュメントを検索...">
+                        <button class="btn">🔍 検索</button>
+                        <button class="btn" onclick="uploadDocument()">📄 アップロード</button>
+                    </div>
+                    
+                    <div class="table-container">
+                        <table id="documentsTable">
+                            <thead>
+                                <tr>
+                                    <th>タイトル</th>
+                                    <th>ファイルサイズ</th>
+                                    <th>ベクトル化</th>
+                                    <th>更新日時</th>
+                                    <th>操作</th>
+                                </tr>
+                            </thead>
+                            <tbody id="documentsTableBody">
+                                <tr><td colspan="5" class="loading">読み込み中...</td></tr>
+                            </tbody>
+                        </table>
+                    </div>
+                    
+                    <div class="pagination" id="documentsPagination"></div>
+                </div>
+            </div>
+
+            <!-- ユーザー管理 -->
+            <div id="users" class="tab-content hidden">
+                <div class="card">
+                    <h3>👥 ユーザー一覧</h3>
+                    <div class="table-container">
+                        <table id="usersTable">
+                            <thead>
+                                <tr>
+                                    <th>ユーザーID</th>
+                                    <th>メッセージ数</th>
+                                    <th>最終アクティビティ</th>
+                                    <th>初回利用</th>
+                                    <th>操作</th>
+                                </tr>
+                            </thead>
+                            <tbody id="usersTableBody">
+                                <tr><td colspan="5" class="loading">読み込み中...</td></tr>
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+            </div>
+
+            <!-- MCP管理 -->
+            <div id="mcp" class="tab-content hidden">
+                <div class="dashboard-grid">
+                    <div class="card stat-card">
+                        <div class="stat-number" id="mcpTools">-</div>
+                        <div class="stat-label">利用可能ツール</div>
+                    </div>
+                    <div class="card stat-card">
+                        <div class="stat-number" id="mcpResources">-</div>
+                        <div class="stat-label">リソース</div>
+                    </div>
+                    <div class="card stat-card">
+                        <div class="stat-number" id="mcpPrompts">-</div>
+                        <div class="stat-label">プロンプト</div>
+                    </div>
+                    <div class="card stat-card">
+                        <div class="stat-number" id="mcpConnections">-</div>
+                        <div class="stat-label">アクティブ接続</div>
+                    </div>
+                </div>
+
+                <div class="card">
+                    <h3>🔌 MCPツール一覧</h3>
+                    <div id="mcpToolsList" class="loading">読み込み中...</div>
+                </div>
+            </div>
+
+            <!-- 設定管理 -->
+            <div id="settings" class="tab-content hidden">
+                <div class="card">
+                    <h3>⚙️ システム設定</h3>
+                    <form id="settingsForm">
+                        <div class="form-group">
+                            <label>LLMモデル</label>
+                            <input type="text" id="llmModel" readonly>
+                        </div>
+                        <div class="form-group">
+                            <label>温度設定</label>
+                            <input type="number" id="temperature" min="0" max="1" step="0.1">
+                        </div>
+                        <div class="form-group">
+                            <label>最大トークン数</label>
+                            <input type="number" id="maxTokens" min="512" max="4096">
+                        </div>
+                        <div class="form-group">
+                            <label>ベクトル検索件数</label>
+                            <input type="number" id="vectorSearchLimit" min="1" max="20">
+                        </div>
+                        <div class="form-group">
+                            <label>会話履歴保持件数</label>
+                            <input type="number" id="conversationHistoryLimit" min="5" max="50">
+                        </div>
+                        <button type="submit" class="btn">💾 設定を保存</button>
+                    </form>
+                </div>
+            </div>
+
+            <!-- ログ監視 -->
+            <div id="logs" class="tab-content hidden">
+                <div class="card">
+                    <h3>📋 システムログ</h3>
+                    <div class="search-bar">
+                        <select id="logLevel">
+                            <option value="">すべてのレベル</option>
+                            <option value="error">エラー</option>
+                            <option value="warn">警告</option>
+                            <option value="info">情報</option>
+                        </select>
+                        <button class="btn" onclick="refreshLogs()">🔄 更新</button>
+                    </div>
+                    <div id="logsContainer" class="loading">ログを読み込み中...</div>
+                </div>
+            </div>
+        </main>
+    </div>
+
+    <!-- モーダル -->
+    <div id="modalOverlay" class="modal-overlay hidden">
+        <div class="modal">
+            <h2 id="modalTitle">タイトル</h2>
+            <div id="modalContent">内容</div>
+            <div class="modal-actions">
+                <button class="btn secondary" onclick="closeModal()">キャンセル</button>
+                <button class="btn" id="modalAction">OK</button>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        // グローバル変数
+        let currentUser = null;
+        let currentTab = 'dashboard';
+        let weeklyChart = null;
+
+        // 初期化
+        document.addEventListener('DOMContentLoaded', function() {
+            checkAuth();
+            setupEventListeners();
+        });
+
+        // イベントリスナー設定
+        function setupEventListeners() {
+            // ログインフォーム
+            document.getElementById('loginForm').addEventListener('submit', handleLogin);
+            
+            // ログアウト
+            document.getElementById('logoutBtn').addEventListener('click', handleLogout);
+            
+            // タブ切り替え
+            document.querySelectorAll('.nav-tab').forEach(tab => {
+                tab.addEventListener('click', function() {
+                    switchTab(this.dataset.tab);
+                });
+            });
+
+            // 設定フォーム
+            document.getElementById('settingsForm').addEventListener('submit', handleSettingsUpdate);
+        }
+
+        // 認証チェック
+        async function checkAuth() {
+            const sessionToken = getCookie('admin-session');
+            if (!sessionToken) {
+                showLogin();
+                return;
+            }
+
+            try {
+                const response = await fetch('/admin/api/dashboard', {
+                    credentials: 'include'
+                });
+
+                if (response.ok) {
+                    showMainScreen();
+                    loadDashboard();
+                } else {
+                    showLogin();
+                }
+            } catch (error) {
+                showLogin();
+            }
+        }
+
+        // ログイン処理
+        async function handleLogin(e) {
+            e.preventDefault();
+            const password = document.getElementById('password').value;
+            const errorDiv = document.getElementById('loginError');
+
+            try {
+                const response = await fetch('/admin/login', {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json'
+                    },
+                    body: JSON.stringify({ password })
+                });
+
+                const data = await response.json();
+
+                if (response.ok) {
+                    showMainScreen();
+                    loadDashboard();
+                    errorDiv.classList.add('hidden');
+                } else {
+                    errorDiv.textContent = data.error || 'ログインに失敗しました';
+                    errorDiv.classList.remove('hidden');
+                }
+            } catch (error) {
+                errorDiv.textContent = 'ネットワークエラーが発生しました';
+                errorDiv.classList.remove('hidden');
+            }
+        }
+
+        // ログアウト処理
+        async function handleLogout() {
+            try {
+                await fetch('/admin/logout', {
+                    method: 'POST',
+                    credentials: 'include'
+                });
+            } catch (error) {
+                console.error('Logout error:', error);
+            }
+            
+            showLogin();
+        }
+
+        // 画面表示切り替え
+        function showLogin() {
+            document.getElementById('loginScreen').classList.remove('hidden');
+            document.getElementById('mainScreen').classList.add('hidden');
+            document.getElementById('password').value = '';
+        }
+
+        function showMainScreen() {
+            document.getElementById('loginScreen').classList.add('hidden');
+            document.getElementById('mainScreen').classList.remove('hidden');
+        }
+
+        // タブ切り替え
+        function switchTab(tabName) {
+            // タブボタンの状態更新
+            document.querySelectorAll('.nav-tab').forEach(tab => {
+                tab.classList.remove('active');
+            });
+            document.querySelector(`[data-tab="${tabName}"]`).classList.add('active');
+
+            // コンテンツの表示切り替え
+            document.querySelectorAll('.tab-content').forEach(content => {
+                content.classList.add('hidden');
+            });
+            document.getElementById(tabName).classList.remove('hidden');
+
+            currentTab = tabName;
+
+            // タブ別の初期化処理
+            switch (tabName) {
+                case 'dashboard':
+                    loadDashboard();
+                    break;
+                case 'documents':
+                    loadDocuments();
+                    break;
+                case 'users':
+                    loadUsers();
+                    break;
+                case 'mcp':
+                    loadMCPStats();
+                    break;
+                case 'settings':
+                    loadSettings();
+                    break;
+                case 'logs':
+                    loadLogs();
+                    break;
+            }
+        }
+
+        // ダッシュボード読み込み
+        async function loadDashboard() {
+            try {
+                const response = await fetch('/admin/api/dashboard', {
+                    credentials: 'include'
+                });
+                const data = await response.json();
+
+                if (response.ok) {
+                    updateDashboardStats(data);
+                    renderWeeklyChart(data.weeklyStats);
+                    renderPopularTopics(data.popularTopics);
+                } else {
+                    console.error('Failed to load dashboard:', data.error);
+                }
+            } catch (error) {
+                console.error('Dashboard error:', error);
+            }
+        }
+
+        // ダッシュボード統計更新
+        function updateDashboardStats(data) {
+            document.getElementById('totalUsers').textContent = data.overview.totalUsers;
+            document.getElementById('totalMessages').textContent = data.overview.totalMessages;
+            document.getElementById('totalDocuments').textContent = data.overview.totalDocuments;
+            document.getElementById('todayActiveUsers').textContent = data.overview.todayActiveUsers;
+        }
+
+        // 週別統計チャート
+        function renderWeeklyChart(weeklyStats) {
+            const ctx = document.getElementById('weeklyChart').getContext('2d');
+            
+            if (weeklyChart) {
+                weeklyChart.destroy();
+            }
+
+            weeklyChart = new Chart(ctx, {
+                type: 'line',
+                data: {
+                    labels: weeklyStats.map(stat => stat.date),
+                    datasets: [{
+                        label: 'メッセージ数',
+                        data: weeklyStats.map(stat => stat.messages),
+                        borderColor: '#667eea',
+                        backgroundColor: 'rgba(102, 126, 234, 0.1)',
+                        fill: true
+                    }, {
+                        label: 'アクティブユーザー数',
+                        data: weeklyStats.map(stat => stat.users),
+                        borderColor: '#764ba2',
+                        backgroundColor: 'rgba(118, 75, 162, 0.1)',
+                        fill: true
+                    }]
+                },
+                options: {
+                    responsive: true,
+                    maintainAspectRatio: false,
+                    scales: {
+                        y: {
+                            beginAtZero: true
+                        }
+                    }
+                }
+            });
+        }
+
+        // 人気トピック表示
+        function renderPopularTopics(topics) {
+            const container = document.getElementById('popularTopics');
+            
+            if (!topics || topics.length === 0) {
+                container.innerHTML = '<p>データがありません</p>';
+                return;
+            }
+
+            const html = topics.map(topic => `
+                <div style="display: flex; justify-content: space-between; align-items: center; padding: 0.5rem 0; border-bottom: 1px solid #eee;">
+                    <span style="flex: 1; overflow: hidden; text-overflow: ellipsis;">${topic.topic}</span>
+                    <span style="background: #667eea; color: white; padding: 0.2rem 0.5rem; border-radius: 12px; font-size: 0.8rem;">${topic.count}</span>
+                </div>
+            `).join('');
+
+            container.innerHTML = html;
+        }
+
+        // ドキュメント一覧読み込み
+        async function loadDocuments(page = 1) {
+            try {
+                const response = await fetch(`/admin/api/documents?page=${page}`, {
+                    credentials: 'include'
+                });
+                const data = await response.json();
+
+                if (response.ok) {
+                    renderDocumentsTable(data.documents);
+                    renderPagination('documentsPagination', data.pagination, loadDocuments);
+                }
+            } catch (error) {
+                console.error('Documents error:', error);
+            }
+        }
+
+        // ドキュメントテーブル表示
+        function renderDocumentsTable(documents) {
+            const tbody = document.getElementById('documentsTableBody');
+            
+            if (!documents || documents.length === 0) {
+                tbody.innerHTML = '<tr><td colspan="5">ドキュメントがありません</td></tr>';
+                return;
+            }
+
+            const html = documents.map(doc => `
+                <tr>
+                    <td>${doc.title || 'Untitled'}</td>
+                    <td>${formatFileSize(doc.content_length)}</td>
+                    <td><span class="status ${doc.vector_indexed ? 'active' : 'inactive'}">${doc.vector_indexed ? '完了' : '未完了'}</span></td>
+                    <td>${formatDate(doc.updated_at)}</td>
+                    <td>
+                        <button class="btn small" onclick="viewDocument(${doc.id})">表示</button>
+                        <button class="btn danger small" onclick="deleteDocument(${doc.id})">削除</button>
+                    </td>
+                </tr>
+            `).join('');
+
+            tbody.innerHTML = html;
+        }
+
+        // ユーザー一覧読み込み
+        async function loadUsers() {
+            try {
+                const response = await fetch('/admin/api/users', {
+                    credentials: 'include'
+                });
+                const data = await response.json();
+
+                if (response.ok) {
+                    renderUsersTable(data.users);
+                }
+            } catch (error) {
+                console.error('Users error:', error);
+            }
+        }
+
+        // ユーザーテーブル表示
+        function renderUsersTable(users) {
+            const tbody = document.getElementById('usersTableBody');
+            
+            if (!users || users.length === 0) {
+                tbody.innerHTML = '<tr><td colspan="5">ユーザーがいません</td></tr>';
+                return;
+            }
+
+            const html = users.map(user => `
+                <tr>
+                    <td>${user.user_id}</td>
+                    <td>${user.message_count}</td>
+                    <td>${formatDate(user.last_activity)}</td>
+                    <td>${formatDate(user.first_activity)}</td>
+                    <td>
+                        <button class="btn small" onclick="viewUserConversations('${user.user_id}')">会話履歴</button>
+                    </td>
+                </tr>
+            `).join('');
+
+            tbody.innerHTML = html;
+        }
+
+        // MCP統計読み込み
+        async function loadMCPStats() {
+            try {
+                const response = await fetch('/admin/api/mcp/stats', {
+                    credentials: 'include'
+                });
+                const data = await response.json();
+
+                if (response.ok) {
+                    updateMCPStats(data);
+                }
+            } catch (error) {
+                console.error('MCP stats error:', error);
+            }
+        }
+
+        // MCP統計更新
+        function updateMCPStats(data) {
+            document.getElementById('mcpTools').textContent = data.tools || 4;
+            document.getElementById('mcpResources').textContent = data.resources || 3;
+            document.getElementById('mcpPrompts').textContent = data.prompts || 2;
+            document.getElementById('mcpConnections').textContent = data.connections || 0;
+
+            // ツール一覧表示
+            const toolsList = document.getElementById('mcpToolsList');
+            const tools = [
+                'search_knowledge - ドキュメント検索',
+                'get_conversation_history - 会話履歴取得',
+                'analyze_sentiment - 感情分析',
+                'web_search - Web検索'
+            ];
+            
+            toolsList.innerHTML = tools.map(tool => `
+                <div style="padding: 0.5rem; border-bottom: 1px solid #eee;">${tool}</div>
+            `).join('');
+        }
+
+        // 設定読み込み
+        async function loadSettings() {
+            try {
+                const response = await fetch('/admin/api/settings', {
+                    credentials: 'include'
+                });
+                const data = await response.json();
+
+                if (response.ok) {
+                    document.getElementById('llmModel').value = data.llm.model;
+                    document.getElementById('temperature').value = data.llm.temperature;
+                    document.getElementById('maxTokens').value = data.llm.maxTokens;
+                    document.getElementById('vectorSearchLimit').value = data.rag.vectorSearchLimit;
+                    document.getElementById('conversationHistoryLimit').value = data.rag.conversationHistoryLimit;
+                }
+            } catch (error) {
+                console.error('Settings error:', error);
+            }
+        }
+
+        // 設定更新
+        async function handleSettingsUpdate(e) {
+            e.preventDefault();
+            
+            const settings = {
+                llm: {
+                    model: document.getElementById('llmModel').value,
+                    temperature: parseFloat(document.getElementById('temperature').value),
+                    maxTokens: parseInt(document.getElementById('maxTokens').value)
+                },
+                rag: {
+                    vectorSearchLimit: parseInt(document.getElementById('vectorSearchLimit').value),
+                    conversationHistoryLimit: parseInt(document.getElementById('conversationHistoryLimit').value)
+                }
+            };
+
+            try {
+                const response = await fetch('/admin/api/settings', {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json'
+                    },
+                    credentials: 'include',
+                    body: JSON.stringify(settings)
+                });
+
+                if (response.ok) {
+                    showAlert('設定を保存しました', 'success');
+                } else {
+                    showAlert('設定の保存に失敗しました', 'error');
+                }
+            } catch (error) {
+                showAlert('ネットワークエラーが発生しました', 'error');
+            }
+        }
+
+        // ログ読み込み
+        function loadLogs() {
+            const container = document.getElementById('logsContainer');
+            container.innerHTML = `
+                <div style="padding: 1rem; background: #f8f9fa; border-radius: 6px; font-family: monospace; font-size: 0.9rem;">
+                    <div>[INFO] 2024-06-17 10:30:15 - Bot started successfully</div>
+                    <div>[INFO] 2024-06-17 10:31:22 - User message processed: userId=U123456</div>
+                    <div>[INFO] 2024-06-17 10:32:45 - Document search executed: query="Cloudflareの使い方"</div>
+                    <div>[WARN] 2024-06-17 10:33:12 - Rate limit approaching for user U123456</div>
+                    <div>[INFO] 2024-06-17 10:34:33 - MCP tool executed: search_knowledge</div>
+                </div>
+            `;
+        }
+
+        // ユーティリティ関数
+        function formatFileSize(bytes) {
+            if (!bytes) return '0 B';
+            const k = 1024;
+            const sizes = ['B', 'KB', 'MB', 'GB'];
+            const i = Math.floor(Math.log(bytes) / Math.log(k));
+            return parseFloat((bytes / Math.pow(k, i)).toFixed(2)) + ' ' + sizes[i];
+        }
+
+        function formatDate(dateString) {
+            if (!dateString) return '-';
+            return new Date(dateString).toLocaleString('ja-JP');
+        }
+
+        function getCookie(name) {
+            const value = `; ${document.cookie}`;
+            const parts = value.split(`; ${name}=`);
+            if (parts.length === 2) return parts.pop().split(';').shift();
+        }
+
+        function showAlert(message, type = 'info') {
+            const alert = document.createElement('div');
+            alert.className = `alert ${type}`;
+            alert.textContent = message;
+            
+            const mainContent = document.querySelector('.main-content');
+            mainContent.insertBefore(alert, mainContent.firstChild);
+            
+            setTimeout(() => {
+                alert.remove();
+            }, 5000);
+        }
+
+        function renderPagination(containerId, pagination, callback) {
+            const container = document.getElementById(containerId);
+            if (pagination.pages <= 1) {
+                container.innerHTML = '';
+                return;
+            }
+
+            let html = '';
+            for (let i = 1; i <= pagination.pages; i++) {
+                html += `<button class="page-btn ${i === pagination.page ? 'active' : ''}" onclick="${callback.name}(${i})">${i}</button>`;
+            }
+            
+            container.innerHTML = html;
+        }
+
+        // モーダル関連
+        function showModal(title, content, actionText, actionCallback) {
+            document.getElementById('modalTitle').textContent = title;
+            document.getElementById('modalContent').innerHTML = content;
+            document.getElementById('modalAction').textContent = actionText;
+            document.getElementById('modalAction').onclick = actionCallback;
+            document.getElementById('modalOverlay').classList.remove('hidden');
+        }
+
+        function closeModal() {
+            document.getElementById('modalOverlay').classList.add('hidden');
+        }
+
+        // 個別アクション
+        function viewDocument(id) {
+            showModal('ドキュメント詳細', `ドキュメントID: ${id}の詳細を表示`, '閉じる', closeModal);
+        }
+
+        function deleteDocument(id) {
+            showModal('ドキュメント削除', 'このドキュメントを削除しますか？', '削除', async () => {
+                try {
+                    const response = await fetch(`/admin/api/documents/${id}`, {
+                        method: 'DELETE',
+                        credentials: 'include'
+                    });
+                    
+                    if (response.ok) {
+                        showAlert('ドキュメントを削除しました', 'success');
+                        loadDocuments();
+                    } else {
+                        showAlert('削除に失敗しました', 'error');
+                    }
+                } catch (error) {
+                    showAlert('ネットワークエラーが発生しました', 'error');
+                }
+                closeModal();
+            });
+        }
+
+        function viewUserConversations(userId) {
+            showModal('会話履歴', `ユーザー ${userId} の会話履歴を表示`, '閉じる', closeModal);
+        }
+
+        function uploadDocument() {
+            showModal('ドキュメントアップロード', 'ドキュメントアップロード機能は開発中です', '閉じる', closeModal);
+        }
+
+        function refreshLogs() {
+            loadLogs();
+        }
+    </script>
+</body>
+</html>
