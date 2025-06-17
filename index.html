@@ -1,0 +1,489 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>LINE RAG Bot - Cloudflare完結型ボット</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+        
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Arial, sans-serif;
+            line-height: 1.6;
+            color: #333;
+            background: #f8f9fa;
+        }
+        
+        header {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+            padding: 2rem 0;
+            text-align: center;
+            box-shadow: 0 2px 10px rgba(0,0,0,0.1);
+        }
+        
+        h1 {
+            font-size: 2.5rem;
+            margin-bottom: 0.5rem;
+        }
+        
+        .subtitle {
+            font-size: 1.2rem;
+            opacity: 0.9;
+        }
+        
+        .container {
+            max-width: 1200px;
+            margin: 0 auto;
+            padding: 2rem;
+        }
+        
+        .card {
+            background: white;
+            border-radius: 12px;
+            padding: 2rem;
+            margin-bottom: 2rem;
+            box-shadow: 0 2px 8px rgba(0,0,0,0.08);
+            transition: transform 0.2s;
+        }
+        
+        .card:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 4px 16px rgba(0,0,0,0.12);
+        }
+        
+        h2 {
+            color: #667eea;
+            margin-bottom: 1rem;
+            font-size: 1.8rem;
+        }
+        
+        h3 {
+            color: #764ba2;
+            margin: 1.5rem 0 0.8rem;
+            font-size: 1.3rem;
+        }
+        
+        .features {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+            gap: 1.5rem;
+            margin: 2rem 0;
+        }
+        
+        .feature {
+            background: #f8f9fa;
+            padding: 1.5rem;
+            border-radius: 8px;
+            border-left: 4px solid #667eea;
+        }
+        
+        .feature h4 {
+            color: #667eea;
+            margin-bottom: 0.5rem;
+        }
+        
+        .links {
+            display: flex;
+            gap: 1rem;
+            margin: 1rem 0;
+            flex-wrap: wrap;
+        }
+        
+        .button {
+            display: inline-block;
+            padding: 0.8rem 1.5rem;
+            background: #667eea;
+            color: white;
+            text-decoration: none;
+            border-radius: 6px;
+            transition: background 0.2s;
+        }
+        
+        .button:hover {
+            background: #764ba2;
+        }
+        
+        .button.secondary {
+            background: #6c757d;
+        }
+        
+        .button.secondary:hover {
+            background: #5a6268;
+        }
+        
+        code {
+            background: #f8f9fa;
+            padding: 0.2rem 0.4rem;
+            border-radius: 4px;
+            font-family: 'Monaco', 'Menlo', monospace;
+            font-size: 0.9em;
+        }
+        
+        pre {
+            background: #f8f9fa;
+            padding: 1rem;
+            border-radius: 6px;
+            overflow-x: auto;
+            margin: 1rem 0;
+            border-left: 4px solid #667eea;
+        }
+        
+        .architecture {
+            background: #2d3748;
+            color: #f7fafc;
+            padding: 1.5rem;
+            border-radius: 8px;
+            font-family: monospace;
+            overflow-x: auto;
+            font-size: 0.9rem;
+            line-height: 1.4;
+        }
+        
+        .cost-table {
+            overflow-x: auto;
+        }
+        
+        table {
+            width: 100%;
+            border-collapse: collapse;
+            margin: 1rem 0;
+        }
+        
+        th, td {
+            text-align: left;
+            padding: 0.8rem;
+            border-bottom: 1px solid #e9ecef;
+        }
+        
+        th {
+            background: #f8f9fa;
+            font-weight: 600;
+            color: #667eea;
+        }
+        
+        .status {
+            display: inline-block;
+            padding: 0.3rem 0.8rem;
+            border-radius: 20px;
+            font-size: 0.85rem;
+            font-weight: 500;
+        }
+        
+        .status.ready {
+            background: #d4edda;
+            color: #155724;
+        }
+        
+        .status.beta {
+            background: #fff3cd;
+            color: #856404;
+        }
+        
+        footer {
+            background: #2d3748;
+            color: white;
+            text-align: center;
+            padding: 2rem;
+            margin-top: 4rem;
+        }
+        
+        @media (max-width: 768px) {
+            h1 {
+                font-size: 2rem;
+            }
+            
+            .container {
+                padding: 1rem;
+            }
+            
+            .card {
+                padding: 1.5rem;
+            }
+        }
+    </style>
+</head>
+<body>
+    <header>
+        <h1>🤖 LINE RAG Bot</h1>
+        <p class="subtitle">Cloudflare完結型の高性能LINE Bot with RAG</p>
+    </header>
+
+    <div class="container">
+        <div class="card">
+            <h2>📋 プロジェクト概要</h2>
+            <p>Cloudflare Workers + Vectorize + D1 + Workers AIを使用した、検索機能と会話履歴を持つLINE Botです。すべてのインフラがCloudflare内で完結し、高速・セキュア・スケーラブルなシステムを実現します。</p>
+            
+            <div class="links">
+                <a href="https://github.com/yukihamada/line-rag-bot" class="button">
+                    📂 GitHubリポジトリ
+                </a>
+                <a href="https://dash.cloudflare.com" class="button secondary">
+                    ⚙️ Cloudflare Dashboard
+                </a>
+                <a href="https://developers.line.biz/console/" class="button secondary">
+                    💬 LINE Developers
+                </a>
+            </div>
+        </div>
+
+        <div class="card">
+            <h2>🏗️ システムアーキテクチャ</h2>
+            <div class="architecture">
+LINE ↔ Cloudflare Worker (Edge) ─┬─ LangChain JS (RAG Chain)
+                                  │
+                                  ├─ Workers AI  (embedding + chat LLM)
+                                  │
+                                  ├─ Vectorize   (semantic search index)
+                                  │
+                                  └─ D1 / KV     (per-user conversation store)
+            </div>
+        </div>
+
+        <div class="card">
+            <h2>✨ 主な機能</h2>
+            <div class="features">
+                <div class="feature">
+                    <h4>🔍 RAG検索</h4>
+                    <p>Vectorizeを使用した高精度な情報検索。関連ドキュメントから最適な回答を生成</p>
+                </div>
+                <div class="feature">
+                    <h4>💬 会話履歴管理</h4>
+                    <p>D1データベースによる永続的な会話記録。文脈を考慮した自然な対話が可能</p>
+                </div>
+                <div class="feature">
+                    <h4>🤖 AI推論</h4>
+                    <p>Workers AI（Llama 3 70B）による高品質な自然言語生成</p>
+                </div>
+                <div class="feature">
+                    <h4>⚡ 高速レスポンス</h4>
+                    <p>Cloudflare Edgeでの処理により1-3秒以内の高速応答を実現</p>
+                </div>
+                <div class="feature">
+                    <h4>🔐 セキュア通信</h4>
+                    <p>LINE署名検証による安全な通信とCloudflareの堅牢なセキュリティ</p>
+                </div>
+                <div class="feature">
+                    <h4>📊 スケーラブル</h4>
+                    <p>Cloudflareのグローバルネットワークで自動スケーリング</p>
+                </div>
+            </div>
+        </div>
+
+        <div class="card">
+            <h2>🚀 セットアップ手順</h2>
+            
+            <h3>1. 環境準備</h3>
+            <pre>git clone https://github.com/yukihamada/line-rag-bot
+cd line-rag-bot
+npm install</pre>
+
+            <h3>2. Cloudflareリソース作成</h3>
+            <pre># D1データベース作成
+wrangler d1 create bot_db
+
+# Vectorizeインデックス作成
+wrangler vectorize create kb_index
+
+# KVネームスペース作成（オプション）
+wrangler kv:namespace create "cache"</pre>
+
+            <h3>3. 環境変数設定</h3>
+            <pre># .envファイルを作成
+cp .env.example .env
+
+# シークレット設定
+wrangler secret put LINE_CHANNEL_SECRET
+wrangler secret put LINE_CHANNEL_TOKEN
+wrangler secret put CF_API_TOKEN
+wrangler secret put CF_ACCOUNT_ID</pre>
+
+            <h3>4. データベース初期化</h3>
+            <pre>wrangler d1 execute bot_db --file=./migrations/0001_create_memory_table.sql</pre>
+
+            <h3>5. ドキュメントアップロード</h3>
+            <pre># documentsフォルダにファイルを配置後
+npm run upload-docs ./documents</pre>
+
+            <h3>6. デプロイ</h3>
+            <pre>wrangler deploy</pre>
+
+            <h3>7. LINE Webhook設定</h3>
+            <p>LINE Developers ConsoleでWebhook URLを設定：</p>
+            <code>https://your-worker-name.your-subdomain.workers.dev/webhook</code>
+        </div>
+
+        <div class="card">
+            <h2>📖 使い方</h2>
+            
+            <h3>基本的な使い方</h3>
+            <ol>
+                <li>LINE公式アカウントを友だち追加</li>
+                <li>質問をメッセージで送信</li>
+                <li>登録されたドキュメントから関連情報を検索して回答</li>
+                <li>会話履歴は自動的に保存され、文脈を考慮した応答が可能</li>
+            </ol>
+
+            <h3>管理者向け操作</h3>
+            <div class="features">
+                <div class="feature">
+                    <h4>ドキュメント追加</h4>
+                    <p><code>documents</code>フォルダに.txtまたは.mdファイルを追加し、<code>npm run upload-docs</code>を実行</p>
+                </div>
+                <div class="feature">
+                    <h4>ログ確認</h4>
+                    <p><code>wrangler tail</code>でリアルタイムログを確認</p>
+                </div>
+                <div class="feature">
+                    <h4>データベース管理</h4>
+                    <p>Cloudflare DashboardのD1セクションから直接SQLを実行可能</p>
+                </div>
+            </div>
+        </div>
+
+        <div class="card">
+            <h2>💰 コスト目安</h2>
+            <div class="cost-table">
+                <table>
+                    <thead>
+                        <tr>
+                            <th>サービス</th>
+                            <th>無料枠</th>
+                            <th>超過時の料金</th>
+                            <th>ステータス</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        <tr>
+                            <td>Workers AI</td>
+                            <td>100k tokens/月</td>
+                            <td>$0.50/1M tokens</td>
+                            <td><span class="status ready">利用可能</span></td>
+                        </tr>
+                        <tr>
+                            <td>Vectorize</td>
+                            <td>1GB / 100kベクトル</td>
+                            <td>$0.20/GB</td>
+                            <td><span class="status ready">利用可能</span></td>
+                        </tr>
+                        <tr>
+                            <td>D1</td>
+                            <td>100k rows/月</td>
+                            <td>従量課金</td>
+                            <td><span class="status ready">利用可能</span></td>
+                        </tr>
+                        <tr>
+                            <td>Workers</td>
+                            <td>100k requests/日</td>
+                            <td>$0.50/1M requests</td>
+                            <td><span class="status ready">利用可能</span></td>
+                        </tr>
+                        <tr>
+                            <td>Containers</td>
+                            <td>未定</td>
+                            <td>未発表</td>
+                            <td><span class="status beta">2025年6月β</span></td>
+                        </tr>
+                    </tbody>
+                </table>
+            </div>
+        </div>
+
+        <div class="card">
+            <h2>🛠️ 開発者向け情報</h2>
+            
+            <h3>利用可能なコマンド</h3>
+            <pre>npm run dev        # ローカル開発サーバー起動
+npm run deploy     # Cloudflareへデプロイ
+npm run typecheck  # TypeScript型チェック
+npm run tail       # リアルタイムログ確認
+npm run upload-docs # ドキュメントアップロード</pre>
+
+            <h3>プロジェクト構造</h3>
+            <pre>line-rag-bot/
+├── src/
+│   ├── index.ts           # メインエントリポイント
+│   ├── types.ts           # TypeScript型定義
+│   ├── line/
+│   │   ├── webhook.ts     # LINE Webhook処理
+│   │   └── api.ts         # LINE API連携
+│   └── langchain/
+│       ├── chain.ts       # RAGチェーン実装
+│       ├── memory.ts      # 会話履歴管理
+│       └── vectorstore.ts # ベクトル検索
+├── migrations/            # D1スキーマ
+├── scripts/              # ユーティリティスクリプト
+├── documents/            # RAG用ドキュメント
+└── wrangler.toml        # Cloudflare設定</pre>
+
+            <h3>カスタマイズポイント</h3>
+            <ul>
+                <li><strong>LLMモデル変更</strong>: <code>src/langchain/chain.ts</code>のモデル指定を変更</li>
+                <li><strong>プロンプト調整</strong>: <code>QA_PROMPT</code>テンプレートを編集</li>
+                <li><strong>検索精度向上</strong>: ベクトル検索のパラメータ（k値）を調整</li>
+                <li><strong>会話履歴の保持期間</strong>: D1クエリのLIMIT値を変更</li>
+            </ul>
+        </div>
+
+        <div class="card">
+            <h2>🔧 トラブルシューティング</h2>
+            
+            <div class="features">
+                <div class="feature">
+                    <h4>LINE署名検証エラー</h4>
+                    <ul>
+                        <li>Channel Secretが正しく設定されているか確認</li>
+                        <li>Webhook URLがHTTPSであることを確認</li>
+                        <li><code>wrangler secret list</code>で設定を確認</li>
+                    </ul>
+                </div>
+                <div class="feature">
+                    <h4>Vectorize検索エラー</h4>
+                    <ul>
+                        <li>インデックスが作成されているか確認</li>
+                        <li>ドキュメントがアップロードされているか確認</li>
+                        <li>Cloudflare Dashboardで状態を確認</li>
+                    </ul>
+                </div>
+                <div class="feature">
+                    <h4>D1接続エラー</h4>
+                    <ul>
+                        <li>Database IDが正しく設定されているか確認</li>
+                        <li>マイグレーションが実行されているか確認</li>
+                        <li><code>wrangler d1 list</code>でデータベース確認</li>
+                    </ul>
+                </div>
+                <div class="feature">
+                    <h4>Workers AIエラー</h4>
+                    <ul>
+                        <li>API トークンの権限を確認</li>
+                        <li>モデル名が正しいか確認</li>
+                        <li>利用制限に達していないか確認</li>
+                    </ul>
+                </div>
+            </div>
+        </div>
+
+        <div class="card">
+            <h2>🔮 今後の拡張案</h2>
+            <ul>
+                <li>🖼️ 画像対応（Workers AI Vision モデル）</li>
+                <li>🌐 多言語対応（自動言語検出）</li>
+                <li>📊 管理ダッシュボード（利用統計・分析）</li>
+                <li>🔄 外部API連携（天気、ニュース等）</li>
+                <li>🎯 ファインチューニング対応</li>
+                <li>📱 リッチメニュー・カルーセル対応</li>
+            </ul>
+        </div>
+    </div>
+
+    <footer>
+        <p>© 2024 LINE RAG Bot - Built with ❤️ on Cloudflare</p>
+        <p>Created by Yuki Hamada | <a href="https://github.com/yukihamada/line-rag-bot" style="color: #667eea;">GitHub</a></p>
+    </footer>
+</body>
+</html>
